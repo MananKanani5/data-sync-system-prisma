@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cinemas {
+  ID                           String  @id
+  CinemaNationalId             String?
+  Name                         String
+  NameAlt                      String
+  PhoneNumber                  String
+  EmailAddress                 String
+  Address1                     String
+  Address2                     String
+  City                         String
+  Latitude                     Float?
+  Longitude                    Float?
+  ParkingInfo                  String
+  LoyaltyCode                  String
+  IsGiftStore                  Boolean
+  Description                  String
+  DescriptionAlt               String?
+  PublicTransport              String
+  CurrencyCode                 String?
+  AllowPrintAtHomeBookings     Boolean
+  AllowOnlineVoucherValidation Boolean
+  DisplaySofaSeats             Boolean
+  TimeZoneId                   String
+  HOPK                         String
+  NameTranslations             Json
+  DescriptionTranslations      Json
+  ParkingInfoTranslations      Json
+  PublicTransportTranslations  Json
+  TipsCompulsory               Boolean
+  TipPercentages               String
+  ServerName                   String?
+  IsInTouchEnabled             Boolean
+  IsGetHelpEnabled             Boolean
+  PrimaryDataLanguage          String?
+  AlternateDataLanguage1       String?
+  AlternateDataLanguage2       String?
+  AlternateDataLanguage3       String?
+  HasConcessions               Boolean
+}
+
+model cinemas_backup {
+  ID                           String  @id
+  CinemaNationalId             String?
+  Name                         String
+  NameAlt                      String
+  PhoneNumber                  String
+  EmailAddress                 String
+  Address1                     String
+  Address2                     String
+  City                         String
+  Latitude                     Float?
+  Longitude                    Float?
+  ParkingInfo                  String
+  LoyaltyCode                  String
+  IsGiftStore                  Boolean
+  Description                  String
+  DescriptionAlt               String?
+  PublicTransport              String
+  CurrencyCode                 String?
+  AllowPrintAtHomeBookings     Boolean
+  AllowOnlineVoucherValidation Boolean
+  DisplaySofaSeats             Boolean
+  TimeZoneId                   String
+  HOPK                         String
+  NameTranslations             Json
+  DescriptionTranslations      Json
+  ParkingInfoTranslations      Json
+  PublicTransportTranslations  Json
+  TipsCompulsory               Boolean
+  TipPercentages               String
+  ServerName                   String?
+  IsInTouchEnabled             Boolean
+  IsGetHelpEnabled             Boolean
+  PrimaryDataLanguage          String?
+  AlternateDataLanguage1       String?
+  AlternateDataLanguage2       String?
+  AlternateDataLanguage3       String?
+  HasConcessions               Boolean
+}
+
+model movies {
+  ID                              String    @id
+  AdditionalUrls                  Json
+  ShortCode                       String
+  Title                           String
+  Rating                          String
+  RatingDescription               String
+  Synopsis                        String?
+  SynopsisAlt                     String
+  SynopsisTranslations            Json
+  ShortSynopsis                   String?
+  HOFilmCode                      String
+  CorporateFilmId                 String?
+  RunTime                         Int
+  OpeningDate                     DateTime?
+  GraphicUrl                      String
+  FilmNameUrl                     String
+  TrailerUrl                      String
+  IsComingSoon                    Boolean
+  IsScheduledAtCinema             Boolean
+  TitleAlt                        String
+  RatingAlt                       String
+  RatingDescriptionAlt            String
+  ShortSynopsisAlt                String?
+  WebsiteUrl                      String
+  GenreId                         String
+  GenreId2                        String?
+  GenreId3                        String?
+  EDICode                         String?
+  FormatCodes                     Json
+  TwitterTag                      String
+  TitleTranslations               Json
+  ShortSynopsisTranslations       Json
+  RatingDescriptionTranslations   Json
+  CustomerRatingStatistics        Json
+  CustomerRatingTrailerStatistics Json
+  FilmWebId                       String?
+  MovieXchangeCode                String?
+  DistributorName                 String
+  GovernmentCode                  String?
+}
