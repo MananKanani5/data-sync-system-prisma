@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv';
 import { fetchCinemaData, fetchMoviesData } from './api';
 import { syncCinemaTables, upsertCinemaData } from './contorllers/cinemas';
-import { upsertMoviesData } from './contorllers/movies';
+import { syncMoviesTables, upsertMoviesData } from './contorllers/movies';
 import cron from 'node-cron';
 
 dotenv.config()
@@ -21,6 +21,7 @@ const syncMoviesData = async () => {
   const moviesData = await fetchMoviesData();
   console.log("Movies data fetched successfully.");
   await upsertMoviesData(moviesData.value);
+  await syncMoviesTables();
 }
 
 cron.schedule('*/5 * * * *', async () => {
