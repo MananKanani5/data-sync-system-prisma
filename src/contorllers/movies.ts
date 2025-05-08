@@ -193,7 +193,7 @@ export const syncMoviesTables = async (): Promise<void> => {
             });
         }
 
-        console.log("Movie data upserted successfully.");
+        console.log("Movie Table Synced successfully.");
     } catch (error: any) {
         console.error("Error upserting movie data:", error);
     }
