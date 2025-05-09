@@ -89,7 +89,7 @@ export const upsertCinemaData = async (cinemaData: any[]): Promise<number> => {
         }
         console.log("Cinema data upserted successfully.");
 
-        return cinemaData.values.length;
+        return cinemaData.length;
     } catch (error: any) {
         console.error("Error upserting cinema data:", error);
         return 0;
