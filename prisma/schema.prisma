@@ -8,7 +8,7 @@ datasource db {
 }
 
 model cinemas {
-  ID                           String  @id
+  ID                           String     @id
   CinemaNationalId             String?
   Name                         String
   NameAlt                      String
@@ -45,6 +45,8 @@ model cinemas {
   AlternateDataLanguage2       String?
   AlternateDataLanguage3       String?
   HasConcessions               Boolean
+  isSynced                     Boolean    @default(false)
+  sessions                     sessions[]
 }
 
 model cinemas_backup {
@@ -127,4 +129,120 @@ model movies {
   MovieXchangeCode                String?
   DistributorName                 String
   GovernmentCode                  String?
+  isSynced                        Boolean   @default(false)
+}
+
+model movies_backup {
+  ID                              String    @id
+  AdditionalUrls                  Json
+  ShortCode                       String
+  Title                           String
+  Rating                          String
+  RatingDescription               String
+  Synopsis                        String?
+  SynopsisAlt                     String
+  SynopsisTranslations            Json
+  ShortSynopsis                   String?
+  HOFilmCode                      String
+  CorporateFilmId                 String?
+  RunTime                         Int
+  OpeningDate                     DateTime?
+  GraphicUrl                      String
+  FilmNameUrl                     String
+  TrailerUrl                      String
+  IsComingSoon                    Boolean
+  IsScheduledAtCinema             Boolean
+  TitleAlt                        String
+  RatingAlt                       String
+  RatingDescriptionAlt            String
+  ShortSynopsisAlt                String?
+  WebsiteUrl                      String
+  GenreId                         String
+  GenreId2                        String?
+  GenreId3                        String?
+  EDICode                         String?
+  FormatCodes                     Json
+  TwitterTag                      String
+  TitleTranslations               Json
+  ShortSynopsisTranslations       Json
+  RatingDescriptionTranslations   Json
+  CustomerRatingStatistics        Json
+  CustomerRatingTrailerStatistics Json
+  FilmWebId                       String?
+  MovieXchangeCode                String?
+  DistributorName                 String
+  GovernmentCode                  String?
+  isSynced                        Boolean   @default(false)
+}
+
+model sessions {
+  ID                                   String   @id
+  CinemaId                             String
+  cinema                               cinemas  @relation(fields: [CinemaId], references: [ID])
+  ScheduledFilmId                      String
+  SessionId                            String
+  AreaCategoryCodes                    Json
+  MinimumTicketPriceInCents            Int?
+  Showtime                             DateTime
+  IsAllocatedSeating                   Boolean
+  AllowChildAdmits                     Boolean
+  SeatsAvailable                       Int
+  AllowComplimentaryTickets            Boolean
+  EventId                              String
+  GlobalEventId                        String?
+  PriceGroupCode                       String
+  ScreenName                           String
+  ScreenNameAlt                        String?
+  ScreenNumber                         Int
+  CinemaOperatorCode                   String
+  FormatCode                           String
+  FormatHOPK                           String
+  SalesChannels                        String
+  SessionAttributesNames               Json
+  ConceptAttributesNames               Json
+  AllowTicketSales                     Boolean
+  HasDynamicallyPricedTicketsAvailable Boolean
+  PlayThroughId                        String?
+  SessionBusinessDate                  DateTime
+  SessionDisplayPriority               Int
+  GroupSessionsByAttribute             Boolean
+  SoldoutStatus                        Int
+  TypeCode                             String
+  InSeatDeliveryFee                    Int?
+  isSynced                             Boolean  @default(false)
+}
+
+model sessions_backup {
+  ID                                   String   @id
+  CinemaId                             String
+  ScheduledFilmId                      String
+  SessionId                            String
+  AreaCategoryCodes                    Json
+  MinimumTicketPriceInCents            Int?
+  Showtime                             DateTime
+  IsAllocatedSeating                   Boolean
+  AllowChildAdmits                     Boolean
+  SeatsAvailable                       Int
+  AllowComplimentaryTickets            Boolean
+  EventId                              String
+  GlobalEventId                        String?
+  PriceGroupCode                       String
+  ScreenName                           String
+  ScreenNameAlt                        String?
+  ScreenNumber                         Int
+  CinemaOperatorCode                   String
+  FormatCode                           String
+  FormatHOPK                           String
+  SalesChannels                        String
+  SessionAttributesNames               Json
+  ConceptAttributesNames               Json
+  AllowTicketSales                     Boolean
+  HasDynamicallyPricedTicketsAvailable Boolean
+  PlayThroughId                        String?
+  SessionBusinessDate                  DateTime
+  SessionDisplayPriority               Int
+  GroupSessionsByAttribute             Boolean
+  SoldoutStatus                        Int
+  TypeCode                             String
+  InSeatDeliveryFee                    Int?
 }

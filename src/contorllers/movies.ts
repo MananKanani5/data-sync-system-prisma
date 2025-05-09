@@ -1,10 +1,33 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
+import { isEqual } from "../utils/isEqual";
 
-
-export const upsertMoviesData = async (moviesData: any[]): Promise<void> => {
+export const upsertMoviesData = async (moviesData: any[]): Promise<number> => {
     try {
-        for (const movie of moviesData) {
+        const moviesDataFromDb = await prisma.movies.findMany();
+        const moviesDataFromDbMap = new Map(moviesDataFromDb.map(m => [m.ID, m]));
+        const moviesToUpsert = moviesData.filter(movie => {
+            const movieFromDb = moviesDataFromDbMap.get(movie.ID);
+            if (!movieFromDb) return true;
+
+            const fieldsToCompare = [
+                "AdditionalUrls", "ShortCode", "Title", "Rating", "RatingDescription", "Synopsis", "SynopsisAlt", "SynopsisTranslations", "ShortSynopsis", "HOFilmCode", "CorporateFilmId", "RunTime", "OpeningDate", "GraphicUrl", "FilmNameUrl", "TrailerUrl", "IsComingSoon", "IsScheduledAtCinema", "TitleAlt", "RatingAlt", "RatingDescriptionAlt", "ShortSynopsisAlt", "WebsiteUrl", "GenreId", "GenreId2", "GenreId3", "EDICode", "FormatCodes", "TwitterTag", "TitleTranslations", "ShortSynopsisTranslations", "RatingDescriptionTranslations", "CustomerRatingStatistics", "CustomerRatingTrailerStatistics", "FilmWebId", "MovieXchangeCode", "DistributorName", "GovernmentCode"
+            ] as const;
+
+            for (const field of fieldsToCompare) {
+                if (!isEqual(movie[field], movieFromDb[field])) {
+                    console.log(`Field changed: ${field}`, {
+                        from: movieFromDb[field],
+                        to: movie[field]
+                    });
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        for (const movie of moviesToUpsert) {
             if (!movie.ID) continue;
 
             await prisma.movies.upsert({
@@ -94,20 +117,43 @@ export const upsertMoviesData = async (moviesData: any[]): Promise<void> => {
         }
 
         console.log("Movie data upserted successfully.");
+        return moviesToUpsert.length;
     } catch (error: any) {
         console.error("Error upserting movie data:", error);
+        return 0;
     }
 };
 
 export const syncMoviesTables = async (): Promise<void> => {
     try {
-
         const moviesData = await prisma.movies.findMany();
 
-        for (const movie of moviesData) {
+        const moviesDataMap = new Map(moviesData.map(m => [m.ID, m]));
+        const moviesToUpsert = moviesData.filter(movie => {
+            const movieFromDb = moviesDataMap.get(movie.ID);
+            if (!movieFromDb) return true;
+
+            const fieldsToCompare = [
+                "AdditionalUrls", "ShortCode", "Title", "Rating", "RatingDescription", "Synopsis", "SynopsisAlt", "SynopsisTranslations", "ShortSynopsis", "HOFilmCode", "CorporateFilmId", "RunTime", "OpeningDate", "GraphicUrl", "FilmNameUrl", "TrailerUrl", "IsComingSoon", "IsScheduledAtCinema", "TitleAlt", "RatingAlt", "RatingDescriptionAlt", "ShortSynopsisAlt", "WebsiteUrl", "GenreId", "GenreId2", "GenreId3", "EDICode", "FormatCodes", "TwitterTag", "TitleTranslations", "ShortSynopsisTranslations", "RatingDescriptionTranslations", "CustomerRatingStatistics", "CustomerRatingTrailerStatistics", "FilmWebId", "MovieXchangeCode", "DistributorName", "GovernmentCode"
+            ] as const;
+
+            for (const field of fieldsToCompare) {
+                if (!isEqual(movie[field], movieFromDb[field])) {
+                    console.log(`Field changed: ${field}`, {
+                        from: movieFromDb[field],
+                        to: movie[field]
+                    });
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        for (const movie of moviesToUpsert) {
             if (!movie.ID) continue;
 
-            await prisma.movies.upsert({
+            await prisma.movies_backup.upsert({
                 where: { ID: movie.ID },
                 update: {
                     AdditionalUrls: movie.AdditionalUrls === null ? Prisma.JsonNull : movie.AdditionalUrls,
@@ -194,6 +240,7 @@ export const syncMoviesTables = async (): Promise<void> => {
         }
 
         console.log("Movie Table Synced successfully.");
+
     } catch (error: any) {
         console.error("Error upserting movie data:", error);
     }

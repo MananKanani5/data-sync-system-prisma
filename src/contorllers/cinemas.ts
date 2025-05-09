@@ -2,7 +2,7 @@ import prisma from "../prisma";
 import { Prisma } from '@prisma/client';
 
 
-export const upsertCinemaData = async (cinemaData: any[]): Promise<void> => {
+export const upsertCinemaData = async (cinemaData: any[]): Promise<number> => {
     try {
         for (const cinema of cinemaData) {
             if (!cinema.ID) continue;
@@ -88,13 +88,16 @@ export const upsertCinemaData = async (cinemaData: any[]): Promise<void> => {
             });
         }
         console.log("Cinema data upserted successfully.");
+
+        return cinemaData.values.length;
     } catch (error: any) {
         console.error("Error upserting cinema data:", error);
+        return 0;
     }
 };
 
 
-export const syncCinemaTables = async (): Promise<void> => {
+export const syncCinemaTables = async (): Promise<number> => {
     try {
 
         const cinemaData = await prisma.cinemas.findMany();
@@ -188,8 +191,12 @@ export const syncCinemaTables = async (): Promise<void> => {
         }
 
         console.log("Cinema Table synced successfully.");
+        const syncedCinemaData: number = await prisma.cinemas_backup.count();
+
+        return syncedCinemaData;
 
     } catch (error: any) {
         console.error("Error syncing cinema tables:", error);
+        return 0;
     }
 }
