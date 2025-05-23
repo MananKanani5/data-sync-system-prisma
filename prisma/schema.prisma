@@ -7,6 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model users {
+  ID           String         @id
+  FirstName    String
+  LastName     String
+  username     String
+  Email        String
+  Password     String
+  PhoneNumber  String
+  CreatedAt    DateTime       @default(now())
+  UpdatedAt    DateTime       @updatedAt
+  IsDeleted    Boolean        @default(false)
+  DeletedAt    DateTime
+  transactions transactions[]
+}
+
 model cinemas {
   ID                           String     @id
   CinemaNationalId             String?
@@ -50,7 +65,7 @@ model cinemas {
 }
 
 model cinemas_backup {
-  ID                           String  @id
+  ID                           String            @id
   CinemaNationalId             String?
   Name                         String
   NameAlt                      String
@@ -87,10 +102,11 @@ model cinemas_backup {
   AlternateDataLanguage2       String?
   AlternateDataLanguage3       String?
   HasConcessions               Boolean
+  sessions_backup              sessions_backup[]
 }
 
 model movies {
-  ID                              String    @id
+  ID                              String     @id
   AdditionalUrls                  Json
   ShortCode                       String
   Title                           String
@@ -129,11 +145,12 @@ model movies {
   MovieXchangeCode                String?
   DistributorName                 String
   GovernmentCode                  String?
-  isSynced                        Boolean   @default(false)
+  isSynced                        Boolean    @default(false)
+  sessions                        sessions[]
 }
 
 model movies_backup {
-  ID                              String    @id
+  ID                              String            @id
   AdditionalUrls                  Json
   ShortCode                       String
   Title                           String
@@ -172,14 +189,16 @@ model movies_backup {
   MovieXchangeCode                String?
   DistributorName                 String
   GovernmentCode                  String?
-  isSynced                        Boolean   @default(false)
+  isSynced                        Boolean           @default(false)
+  sessions_backup                 sessions_backup[]
 }
 
 model sessions {
-  ID                                   String   @id
+  ID                                   String         @id
   CinemaId                             String
-  cinema                               cinemas  @relation(fields: [CinemaId], references: [ID])
+  cinema                               cinemas        @relation(fields: [CinemaId], references: [ID])
   ScheduledFilmId                      String
+  scheduledFilm                        movies         @relation(fields: [ScheduledFilmId], references: [ID])
   SessionId                            String
   AreaCategoryCodes                    Json
   MinimumTicketPriceInCents            Int?
@@ -209,13 +228,16 @@ model sessions {
   SoldoutStatus                        Int
   TypeCode                             String
   InSeatDeliveryFee                    Int?
-  isSynced                             Boolean  @default(false)
+  isSynced                             Boolean        @default(false)
+  transactions                         transactions[]
 }
 
 model sessions_backup {
-  ID                                   String   @id
+  ID                                   String         @id
   CinemaId                             String
+  cinema                               cinemas_backup @relation(fields: [CinemaId], references: [ID])
   ScheduledFilmId                      String
+  scheduledFilm                        movies_backup  @relation(fields: [ScheduledFilmId], references: [ID])
   SessionId                            String
   AreaCategoryCodes                    Json
   MinimumTicketPriceInCents            Int?
@@ -245,4 +267,21 @@ model sessions_backup {
   SoldoutStatus                        Int
   TypeCode                             String
   InSeatDeliveryFee                    Int?
+  transactions                         transactions[]
+}
+
+model transactions {
+  ID                  String          @id
+  SessionId           String
+  Session             sessions_backup @relation(fields: [SessionId], references: [ID])
+  TransactionId       String
+  TransactionDateTime DateTime
+  UserId              String
+  User                users           @relation(fields: [UserId], references: [ID])
+  CreatedAt           DateTime        @default(now())
+  UpdatedAt           DateTime        @updatedAt
+  IsDeleted           Boolean         @default(false)
+  DeletedAt           DateTime
+  sessions            sessions?       @relation(fields: [sessionsID], references: [ID])
+  sessionsID          String?
 }

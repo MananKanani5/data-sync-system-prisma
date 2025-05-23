@@ -5,11 +5,18 @@ import { syncCinemaTables, upsertCinemaData } from './contorllers/cinemas';
 import { syncMoviesTables, upsertMoviesData } from './contorllers/movies';
 import cron from 'node-cron';
 import { syncSessionTables, upsertSessionsData } from './contorllers/sessions';
+import cors from "cors";
+import routes from './routes';
 
 dotenv.config()
 const app = express()
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: "*",
+  credentials: true,
+}));
 
 const syncCinemaData = async () => {
   console.time("Syncing cinema data Time");
@@ -46,11 +53,17 @@ const syncSessionData = async () => {
 
 }
 
-cron.schedule('*/5 * * * *', async () => {
-  await syncCinemaData();
-  await syncMoviesData();
-  await syncSessionData();
-});
+// cron.schedule('*/5 * * * *', async () => {
+//   await syncCinemaData();
+//   await syncMoviesData();
+//   await syncSessionData();
+// });
+
+syncCinemaData();
+syncMoviesData();
+syncSessionData();
+
+app.use('/api', routes);
 
 app.listen(process.env.PORT, () =>
   console.log("Server ready at: http://localhost:3000"),

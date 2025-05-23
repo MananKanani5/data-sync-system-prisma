@@ -99,9 +99,7 @@ export const upsertCinemaData = async (cinemaData: any[]): Promise<number> => {
 
 export const syncCinemaTables = async (): Promise<number> => {
     try {
-
         const cinemaData = await prisma.cinemas.findMany();
-
         if (!cinemaData) {
             throw new Error("Cinema data not found in main table");
         };
@@ -194,7 +192,6 @@ export const syncCinemaTables = async (): Promise<number> => {
         const syncedCinemaData: number = await prisma.cinemas_backup.count();
 
         return syncedCinemaData;
-
     } catch (error: any) {
         console.error("Error syncing cinema tables:", error);
         return 0;

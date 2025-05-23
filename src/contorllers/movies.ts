@@ -45,7 +45,7 @@ export const upsertMoviesData = async (moviesData: any[]): Promise<number> => {
                     HOFilmCode: movie.HOFilmCode,
                     CorporateFilmId: movie.CorporateFilmId,
                     RunTime: movie.RunTime,
-                    OpeningDate: movie.OpeningDate ? new Date(movie.OpeningDate).toISOString() : null,
+                    OpeningDate: movie.OpeningDate ? movie.OpeningDate : null,
                     GraphicUrl: movie.GraphicUrl,
                     FilmNameUrl: movie.FilmNameUrl,
                     TrailerUrl: movie.TrailerUrl,
@@ -86,7 +86,7 @@ export const upsertMoviesData = async (moviesData: any[]): Promise<number> => {
                     HOFilmCode: movie.HOFilmCode,
                     CorporateFilmId: movie.CorporateFilmId,
                     RunTime: movie.RunTime,
-                    OpeningDate: movie.OpeningDate ? new Date(movie.OpeningDate).toISOString() : null,
+                    OpeningDate: movie.OpeningDate ? movie.OpeningDate : null,
                     GraphicUrl: movie.GraphicUrl,
                     FilmNameUrl: movie.FilmNameUrl,
                     TrailerUrl: movie.TrailerUrl,
@@ -126,28 +126,20 @@ export const upsertMoviesData = async (moviesData: any[]): Promise<number> => {
 
 export const syncMoviesTables = async (): Promise<void> => {
     try {
-        const moviesData = await prisma.movies.findMany();
+        const sourceMovies = await prisma.movies.findMany();
+        const targetMovies = await prisma.movies_backup.findMany();
 
-        const moviesDataMap = new Map(moviesData.map(m => [m.ID, m]));
-        const moviesToUpsert = moviesData.filter(movie => {
-            const movieFromDb = moviesDataMap.get(movie.ID);
-            if (!movieFromDb) return true;
+        const targetMoviesMap = new Map(targetMovies.map(m => [m.ID, m]));
+
+        const moviesToUpsert = sourceMovies.filter(movie => {
+            const targetMovie = targetMoviesMap.get(movie.ID);
+            if (!targetMovie) return true;
 
             const fieldsToCompare = [
                 "AdditionalUrls", "ShortCode", "Title", "Rating", "RatingDescription", "Synopsis", "SynopsisAlt", "SynopsisTranslations", "ShortSynopsis", "HOFilmCode", "CorporateFilmId", "RunTime", "OpeningDate", "GraphicUrl", "FilmNameUrl", "TrailerUrl", "IsComingSoon", "IsScheduledAtCinema", "TitleAlt", "RatingAlt", "RatingDescriptionAlt", "ShortSynopsisAlt", "WebsiteUrl", "GenreId", "GenreId2", "GenreId3", "EDICode", "FormatCodes", "TwitterTag", "TitleTranslations", "ShortSynopsisTranslations", "RatingDescriptionTranslations", "CustomerRatingStatistics", "CustomerRatingTrailerStatistics", "FilmWebId", "MovieXchangeCode", "DistributorName", "GovernmentCode"
             ] as const;
 
-            for (const field of fieldsToCompare) {
-                if (!isEqual(movie[field], movieFromDb[field])) {
-                    console.log(`Field changed: ${field}`, {
-                        from: movieFromDb[field],
-                        to: movie[field]
-                    });
-                    return true;
-                }
-            }
-
-            return false;
+            return fieldsToCompare.some(field => !isEqual(movie[field], targetMovie[field]));
         });
 
         for (const movie of moviesToUpsert) {
@@ -168,7 +160,7 @@ export const syncMoviesTables = async (): Promise<void> => {
                     HOFilmCode: movie.HOFilmCode,
                     CorporateFilmId: movie.CorporateFilmId,
                     RunTime: movie.RunTime,
-                    OpeningDate: movie.OpeningDate ? new Date(movie.OpeningDate).toISOString() : null,
+                    OpeningDate: movie.OpeningDate ? `${movie.OpeningDate}.000Z` : null,
                     GraphicUrl: movie.GraphicUrl,
                     FilmNameUrl: movie.FilmNameUrl,
                     TrailerUrl: movie.TrailerUrl,
@@ -209,7 +201,7 @@ export const syncMoviesTables = async (): Promise<void> => {
                     HOFilmCode: movie.HOFilmCode,
                     CorporateFilmId: movie.CorporateFilmId,
                     RunTime: movie.RunTime,
-                    OpeningDate: movie.OpeningDate ? new Date(movie.OpeningDate).toISOString() : null,
+                    OpeningDate: movie.OpeningDate ? new Date(movie.OpeningDate) : null,
                     GraphicUrl: movie.GraphicUrl,
                     FilmNameUrl: movie.FilmNameUrl,
                     TrailerUrl: movie.TrailerUrl,
@@ -245,4 +237,3 @@ export const syncMoviesTables = async (): Promise<void> => {
         console.error("Error upserting movie data:", error);
     }
 };
-

@@ -29,15 +29,13 @@ export const fetchMoviesData = async () => {
     );
     const allMovies = res.data?.value || [];
 
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-    const filteredData = allMovies.filter((movie: any) => {
-      const openingDate = movie.OpeningDate ? new Date(movie.OpeningDate) : null;
-      return openingDate !== null && openingDate >= oneMonthAgo;
+    const filterData = allMovies.map((movie: any) => {
+      return {
+        ...movie,
+        OpeningDate: movie.OpeningDate ? `${movie.OpeningDate}.000Z` : null
+      };
     });
-
-    return filteredData;
+    return filterData;
   } catch (err: any) {
     console.error("Movies fetching Error", err.message);
   }

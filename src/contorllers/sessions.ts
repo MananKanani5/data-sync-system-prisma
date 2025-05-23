@@ -1,6 +1,9 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../prisma";
 import { isEqual } from "../utils/isEqual";
+import { sendResponse } from "../utils/responseUtils";
+import { Request, Response } from "express";
+import STATUS_CODES from "../utils/statusCodes";
 
 export const upsertSessionsData = async (sessionsData: any[]): Promise<number> => {
     try {
@@ -40,6 +43,16 @@ export const upsertSessionsData = async (sessionsData: any[]): Promise<number> =
 
         for (const session of sessionsToUpsert) {
             if (!session.ID) continue;
+
+            const scheduledFilmExists = await prisma.movies.findUnique({
+                where: { ID: session.ScheduledFilmId },
+                select: { ID: true }
+            });
+
+            if (!scheduledFilmExists) {
+                console.warn(`Skipping session ${session.ID} because ScheduledFilmId ${session.ScheduledFilmId} not found.`);
+                continue;
+            }
 
             await prisma.sessions.upsert({
                 where: { ID: session.ID },
@@ -159,6 +172,16 @@ export const syncSessionTables = async () => {
         for (const session of sessionsToUpsert) {
             if (!session.ID) continue;
 
+            const scheduledFilmExists = await prisma.movies_backup.findUnique({
+                where: { ID: session.ScheduledFilmId },
+                select: { ID: true }
+            });
+
+            if (!scheduledFilmExists) {
+                console.warn(`Skipping session ${session.ID} because ScheduledFilmId ${session.ScheduledFilmId} not found.`);
+                continue;
+            }
+
             await prisma.sessions_backup.upsert({
                 where: { ID: session.ID },
                 update: {
@@ -235,5 +258,47 @@ export const syncSessionTables = async () => {
 
     } catch (error: any) {
         console.error("Error syncing session tables:", error);
+    }
+}
+
+export const getSessions = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const sessions = await prisma.sessions_backup.findMany({
+            select: {
+                ID: true,
+                SessionId: true,
+                Showtime: true,
+                SeatsAvailable: true,
+                ScreenName: true,
+                ScreenNumber: true,
+                cinema: {
+                    select: {
+                        ID: true,
+                        Name: true,
+                        Latitude: true,
+                        Longitude: true,
+                        Address1: true,
+                        City: true,
+                        TimeZoneId: true,
+                    }
+                },
+                scheduledFilm: {
+                    select: {
+                        ID: true,
+                        Title: true,
+                        OpeningDate: true,
+                    }
+                }
+            }
+        });
+
+
+        const filteredData = sessions.forEach((session) => {
+            session.Showtime = new Date(session.Showtime);
+        })
+
+        sendResponse(res, true, filteredData, "", STATUS_CODES.OK);
+    } catch (error: any) {
+        sendResponse(res, false, error, "server Error", STATUS_CODES.SERVER_ERROR);
     }
 }
