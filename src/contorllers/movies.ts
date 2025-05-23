@@ -160,7 +160,7 @@ export const syncMoviesTables = async (): Promise<void> => {
                     HOFilmCode: movie.HOFilmCode,
                     CorporateFilmId: movie.CorporateFilmId,
                     RunTime: movie.RunTime,
-                    OpeningDate: movie.OpeningDate ? `${movie.OpeningDate}.000Z` : null,
+                    OpeningDate: movie.OpeningDate ? movie.OpeningDate : null,
                     GraphicUrl: movie.GraphicUrl,
                     FilmNameUrl: movie.FilmNameUrl,
                     TrailerUrl: movie.TrailerUrl,

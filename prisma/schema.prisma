@@ -32,8 +32,8 @@ model cinemas {
   Address1                     String
   Address2                     String
   City                         String
-  Latitude                     Float?
-  Longitude                    Float?
+  Latitude                     String?
+  Longitude                    String?
   ParkingInfo                  String
   LoyaltyCode                  String
   IsGiftStore                  Boolean
@@ -74,8 +74,8 @@ model cinemas_backup {
   Address1                     String
   Address2                     String
   City                         String
-  Latitude                     Float?
-  Longitude                    Float?
+  Latitude                     String?
+  Longitude                    String?
   ParkingInfo                  String
   LoyaltyCode                  String
   IsGiftStore                  Boolean
